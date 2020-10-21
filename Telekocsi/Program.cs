@@ -13,7 +13,7 @@ namespace Telekocsi
         static List<Igeny> Igenyek = new List<Igeny>();
 
 
-        static void BeolvasAutok()
+        static void Beolvasas()
         {
             StreamReader sr = new StreamReader("autok.csv");
             sr.ReadLine();
@@ -22,6 +22,16 @@ namespace Telekocsi
                 Autok.Add(new Auto(sr.ReadLine()));
             }
             sr.Close();
+
+            StreamReader file = new StreamReader("igenyek.csv");
+            file.ReadLine();
+            while (!file.EndOfStream)
+            {
+                Igenyek.Add(new Igeny(file.ReadLine()));
+            }
+            file.Close();
+
+
         }
 
 
@@ -49,33 +59,66 @@ namespace Telekocsi
 
         static void NegyedikFeladat()
         {
-            List<string> utvonalak = new List<string>();
-            foreach (var a in Autok)
-            {
+            //Létrehozzu az Auto osztályba az Utvonal-at.
+            Console.WriteLine("4. feladat:");
+            //Dictionary<string, int> utvonalak = new Dictionary<string, int>();
+            //foreach (var a in Autok)
+            //{
+            //    if (!utvonalak.ContainsKey(a.Utvonal))
+            //    {
+            //        utvonalak.Add(a.Utvonal, a.Ferohely);
+            //    }
+            //    else
+            //    {
+            //        utvonalak[a.Utvonal] = utvonalak[a.Utvonal] + a.Ferohely;
+            //    }
+            //}
+            int max = 0;
+            string utvonal = "";
+            //foreach (var u in utvonalak)
+            //{
+            //    if (u.Value > max)
+            //    {
+            //        max = u.Value;
+            //        utvonal = u.Key;
+            //    }
+            //}
 
+            //Console.WriteLine($"   {max} - {utvonal}");
+
+            var utvonalak = from a in Autok orderby a.Utvonal group a by a.Utvonal into temp select temp;
+
+            foreach (var ut in utvonalak)
+            {
+                //Console.WriteLine($"{ut.Key} -> {ut.Count()}");
+                int fh = ut.Sum(x => x.Ferohely);
+                if (max < fh)
+                {
+                    max = fh;
+                    utvonal = ut.Key;
+                }
             }
+            Console.WriteLine($"   {max} - {utvonal}");
+
+
+            Console.ReadKey();
         }
 
 
-        static void BeolvasIgenyek()
+        static void OtodikFeladat()
         {
-            StreamReader sr = new StreamReader("igenyek.csv");
-            sr.ReadLine();
-            while (!sr.EndOfStream)
+            Console.WriteLine("5. feladat:");
+            foreach (var igeny in Igenyek)
             {
-                Igenyek.Add(new Igeny(sr.ReadLine()));
-            }
-            sr.Close();
-
-
-            foreach (var a in Autok)
-            {
-                foreach (var i in Igenyek)
+                int i = 0;
+                while (i < Autok.Count && !(igeny.Indulas == Autok[i].Indulas
+                    && igeny.Cel == Autok[i].Cel && igeny.Szemelyek <= Autok[i].Ferohely))
                 {
-                    if (i.Indulas == a.Indulas && i.Cel == a.Cel && i.Szemelyek == a.Ferohely)
-                    {
-                        Console.WriteLine($"{i.Azonosito} => {a.Rendszam}");
-                    }
+                    i++;
+                }
+                if (i < Autok.Count)
+                {
+                    Console.WriteLine($"{igeny.Azonosito} => {Autok[i].Rendszam}");
                 }
             }
         }
@@ -84,26 +127,26 @@ namespace Telekocsi
         static void HatodikFeladat()
         {
             StreamWriter sw = new StreamWriter("utasuzenetek.txt");
-            foreach (var a in Autok)
+            foreach (var igeny in Igenyek)
             {
-                foreach (var i in Igenyek)
+                int i = 0;
+                while (i < Autok.Count && !(igeny.Indulas == Autok[i].Indulas
+                    && igeny.Cel == Autok[i].Cel && igeny.Szemelyek <= Autok[i].Ferohely))
                 {
-                    if (a.Ferohely == 0)
-                    {
-                        sw.WriteLine("{0}: Sajnos nem sikerült autót találni.", i.Azonosito);
-                    }
-                    else
-                    {
-                        sw.WriteLine("{0}: Rendszám: {1}, Telefonszám: {2}", i.Azonosito, a.Rendszam, a.Telefonszam);
-                    }
+                    i++;
+                }
+                if (i < Autok.Count)
+                {
+                    sw.WriteLine($"{igeny.Azonosito}: Rendszám: {Autok[i].Rendszam}, Telefonszám: {Autok[i].Telefonszam}");
                 }
             }
+            sw.Close();
         }
 
 
         static void Main(string[] args)
         {
-            BeolvasAutok();
+            Beolvasas();
             foreach (var a in Autok)
             {
                 Console.WriteLine($"{a.Indulas}, {a.Cel}, {a.Rendszam}, {a.Telefonszam}, {a.Ferohely}");
@@ -112,7 +155,7 @@ namespace Telekocsi
             MasodikFeladat();
             HarmadikFeladat();
             NegyedikFeladat();
-            BeolvasIgenyek();
+            OtodikFeladat();
             HatodikFeladat();
 
 
