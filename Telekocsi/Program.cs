@@ -139,6 +139,10 @@ namespace Telekocsi
                 {
                     sw.WriteLine($"{igeny.Azonosito}: Rendszám: {Autok[i].Rendszam}, Telefonszám: {Autok[i].Telefonszam}");
                 }
+                else
+                {
+                    sw.WriteLine($"{igeny.Azonosito}: Sajnos nem sikerült autót találni.");
+                }
             }
             sw.Close();
         }
