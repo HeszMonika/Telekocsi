@@ -110,13 +110,9 @@ namespace Telekocsi
             Console.WriteLine("5. feladat:");
             foreach (var igeny in Igenyek)
             {
-                int i = 0;
-                while (i < Autok.Count && !(igeny.Indulas == Autok[i].Indulas
-                    && igeny.Cel == Autok[i].Cel && igeny.Szemelyek <= Autok[i].Ferohely))
-                {
-                    i++;
-                }
-                if (i < Autok.Count)
+                int i = igeny.VanAuto(Autok);
+
+                if (i > -1)
                 {
                     Console.WriteLine($"{igeny.Azonosito} => {Autok[i].Rendszam}");
                 }
@@ -129,13 +125,8 @@ namespace Telekocsi
             StreamWriter sw = new StreamWriter("utasuzenetek.txt");
             foreach (var igeny in Igenyek)
             {
-                int i = 0;
-                while (i < Autok.Count && !(igeny.Indulas == Autok[i].Indulas
-                    && igeny.Cel == Autok[i].Cel && igeny.Szemelyek <= Autok[i].Ferohely))
-                {
-                    i++;
-                }
-                if (i < Autok.Count)
+                int i = igeny.VanAuto(Autok);
+                if (i > -1)
                 {
                     sw.WriteLine($"{igeny.Azonosito}: Rendszám: {Autok[i].Rendszam}, Telefonszám: {Autok[i].Telefonszam}");
                 }
